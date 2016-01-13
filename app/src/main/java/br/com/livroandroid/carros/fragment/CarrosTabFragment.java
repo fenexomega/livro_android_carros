@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import br.com.livroandroid.carros.R;
 import br.com.livroandroid.carros.adapter.TabsAdapter;
+import br.com.livroandroid.carros.other.Prefs;
 
 public class CarrosTabFragment extends Fragment implements
         TabLayout.OnTabSelectedListener {
@@ -32,7 +33,7 @@ public class CarrosTabFragment extends Fragment implements
 
         //View pager
         viewpager.setOffscreenPageLimit(2);
-        viewpager.setAdapter(new TabsAdapter(getContext(),getChildFragmentManager()));
+        viewpager.setAdapter(new TabsAdapter(getContext(), getChildFragmentManager()));
         //TABS
         tablayout.addTab(tablayout.newTab().setText(R.string.classicos));
         tablayout.addTab(tablayout.newTab().setText(R.string.esportivos));
@@ -42,6 +43,10 @@ public class CarrosTabFragment extends Fragment implements
         //Se mudar o viewpager atualiza a tab selecionada
         viewpager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tablayout));
 
+        //AO criar a view, mostra a última tab selecionada
+        int tabIdx = Prefs.getInt(getContext(),"tabIdx");
+        viewpager.setCurrentItem(tabIdx);
+
 
         return view;
     }
@@ -49,7 +54,7 @@ public class CarrosTabFragment extends Fragment implements
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         viewpager.setCurrentItem(tab.getPosition());
-
+        Prefs.setInt(getContext(),"tabIdx",tab.getPosition());
 
     }
 

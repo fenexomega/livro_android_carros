@@ -1,5 +1,6 @@
 package br.com.livroandroid.carros.activity;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.widget.ListAdapter;
 
 import java.util.List;
 
+import br.com.livroandroid.carros.activity.prefs.ConfiguracoesActivity;
+import br.com.livroandroid.carros.activity.prefs.ConfiguracoesV11Activity;
 import br.com.livroandroid.carros.fragment.CarrosTabFragment;
 import br.com.livroandroid.carros.R;
 import br.com.livroandroid.carros.adapter.NavDrawerMenuAdapter;
@@ -19,6 +22,7 @@ import br.com.livroandroid.carros.adapter.NavDrawerMenuItem;
 import br.com.livroandroid.carros.fragment.AboutDialog;
 import br.com.livroandroid.carros.fragment.SiteLivroFragment;
 import livroandroid.lib.fragment.NavigationDrawerFragment;
+import livroandroid.lib.utils.AndroidUtils;
 
 public class MainActivity extends BaseActivity
     implements NavigationDrawerFragment.NavigationDrawerCallbacks{
@@ -31,7 +35,7 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
         if(id == R.id.action_about)
         {
-            toast("Clicou no Sobre");
+            AboutDialog.showAbout(getSupportFragmentManager());
             return true;
 
         }
@@ -106,7 +110,10 @@ public class MainActivity extends BaseActivity
                 changeFragmentOnPage(new SiteLivroFragment());
                 break;
             case 2:
-                AboutDialog.showAbout(getSupportFragmentManager());
+                if(AndroidUtils.isAndroid3Honeycomb())
+                    startActivity(new Intent(this, ConfiguracoesActivity.class));
+                else
+                    startActivity(new Intent(this, ConfiguracoesV11Activity.class));
                 break;
             default:
                 toast("Erro!");
