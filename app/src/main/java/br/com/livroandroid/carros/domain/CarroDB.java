@@ -3,11 +3,15 @@ package br.com.livroandroid.carros.domain;
 import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jordy on 1/13/16.
@@ -82,6 +86,79 @@ public class CarroDB extends SQLiteOpenHelper {
             int count = db.delete("carro","_id=?",new String[]{String.valueOf(carro.id)});
             Log.i(TAG, "Deletou o carro de id = " + count);
             return count;
+        }
+        finally {
+            db.close();
+        }
+    }
+
+    public int deleteCarrosByTipo(String tipo)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        try{
+            Cursor c = db.query("carro", null, null, null, null, null, null);
+            return toList(c);
+        }
+        finally {
+            db.close();
+        }
+    }
+
+    public List<Carro> findAllByTipo(String tipo)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            Cursor c = db.query("carro",null,"tipo = '" + tipo + "'",null,null,null,null);
+            return toList(c);
+        }
+        finally {
+            db.close();
+        }
+    }
+
+    // Lê o cursor e cria a lista de carros
+    private List<Carro> toList(Cursor c)
+    {
+        List<Carro> carros = new ArrayList<Carro>();
+        if (c.moveToFirst())
+        {
+            do {
+                Carro carro = new Carro();
+                carros.add(carro);
+                //recupera os atributos do carro
+                carro.id        = c.getLong(c.getColumnIndex("_id"));
+                carro.nome      = c.getString(c.getColumnIndex("nome"));
+                carro.desc      = c.getString(c.getColumnIndex("desc"));
+                carro.urlInfo   = c.getString(c.getColumnIndex("urlInfo"));
+                carro.urlFoto   = c.getString(c.getColumnIndex("urlFoto"));
+                carro.urlVideo  = c.getString(c.getColumnIndex("urlVideo"));
+                carro.latitude  = c.getString(c.getColumnIndex("latitude"));
+                carro.longitude = c.getString(c.getColumnIndex("longitude"));
+                carro.tipo      = c.getString(c.getColumnIndex("tipo"));
+
+            } while(c.moveToNext());
+        }
+        return carros;
+    }
+
+    //Executa um SQL
+    public void execSQL(String sql)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        try
+        {
+            db.execSQL(sql);
+        }
+        finally {
+            db.close();
+        }
+    }
+
+    public void execSQL(String sql, Object[] args)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            db.execSQL(sql,args);
         }
         finally {
             db.close();
